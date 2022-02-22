@@ -1,11 +1,21 @@
 {
-  "name": "mern-ticket",
-  "version": "1.0.0",
-  "description": "Goalsetter app for youtube tutorial",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "rayhansoe",
-  "license": "MIT"
+	"name": "mern-ticket",
+	"version": "1.0.0",
+	"description": "Goalsetter app for youtube tutorial",
+	"main": "server.js",
+	"scripts": {
+		"start": "node backend/server.js",
+		"server": "nodemon backend/server.js"
+	},
+	"author": "rayhansoe",
+	"license": "MIT",
+	"dependencies": {
+		"colors": "^1.4.0",
+		"dotenv": "^16.0.0",
+		"express": "^4.17.3",
+		"mongoose": "^6.2.3"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.15"
+	}
 }
