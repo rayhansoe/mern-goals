@@ -1,5 +1,5 @@
 {
-	"name": "mern-ticket",
+	"name": "mern-goals",
 	"version": "1.0.0",
 	"description": "Goalsetter app for youtube tutorial",
 	"main": "server.js",
