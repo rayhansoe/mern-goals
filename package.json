@@ -1,0 +1,11 @@
+{
+  "name": "mern-ticket",
+  "version": "1.0.0",
+  "description": "Goalsetter app for youtube tutorial",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "rayhansoe",
+  "license": "MIT"
+}
