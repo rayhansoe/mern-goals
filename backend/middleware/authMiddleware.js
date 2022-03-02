@@ -20,16 +20,48 @@ const protect = asyncHandler( async (req, res, next) => {
             next()
             
         } catch (error) {
-            console.log(error);
+            console.log(error)
             res.status(401)
             throw new Error('Not Authorized')
         }
     }
 
     if (!token) {
-        next()
+        res.status(401)
+        throw new Error('Not Authorized, no token.')
     }
 
 })
 
-module.exports = { protect }
+const protectGetUser = asyncHandler( async (req, res, next) => {
+    let token 
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+
+            // Get Token from header
+            token = req.headers.authorization.split(' ')[1]
+
+            // verify
+            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+            // Get User from the Token / User yang login, bukan user yang mau dilihat.
+            req.user = await User.findById(decoded.id).select('-password')
+            
+            next()
+            
+        } catch (error) {
+            console.log(error)
+            res.status(401)
+            throw new Error('Not Authorized')
+        }
+    }
+
+    if (!token) {
+            next() 
+        
+    }
+
+})
+
+module.exports = { protect, protectGetUser }
