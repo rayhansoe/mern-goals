@@ -1,4 +1,4 @@
-const User = require('../model/userModel')
+const User = require('../models/userModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const asyncHandler = require('express-async-handler')
@@ -86,15 +86,30 @@ const loginUser = asyncHandler(async (req, res) => {
 // @route GET /api/users
 // @access PUBLIC & PRIVATE
 const getUserProfile = asyncHandler(async (req, res) => {
-	const username = req.params.username
-	const userExist = await User.findOne({ username })
-
+	const usernameParam = req.params.username
+	const userExist = await User.findOne({ username: usernameParam })
+	
 	// if user exist
 	if (userExist) {
-		res.status(200).json({
-			username: userExist.username,
-			name: userExist.name,
-		})
+		const { _id, username, name, email } = userExist
+
+		if (req.user && (userExist.id === req.user.id)) {
+			
+			res.status(200).json({
+				id: _id,
+				username,
+				name,
+				email
+			})
+		} else {
+			
+			res.status(200).json({
+				id: _id,
+				username,
+				name
+			})
+		}
+
 	} else {
 		res.status(404)
 		throw new Error('the username is invalid.')
