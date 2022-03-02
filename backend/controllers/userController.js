@@ -50,6 +50,7 @@ const registerUser = asyncHandler(async (req, res) => {
 			username: user.username,
 			name: user.name,
 			email: user.email,
+			token: generateToken(user._id),
 		})
 	} else {
 		res.status(400)
@@ -61,7 +62,24 @@ const registerUser = asyncHandler(async (req, res) => {
 // @route POST /api/users/login
 // @access PUBLIC
 const loginUser = asyncHandler(async (req, res) => {
-	res.status(201).json({ message: 'User login.' })
+	const { email, username, password } = req.body
+
+	// check user
+	const user = (await User.findOne({ email })) || (await User.findOne({ username }))
+
+	if (user && (await bcrypt.compare(password, user.password))) {
+		res.status(200)
+		res.json({
+			_id: user.id,
+			username: user.username,
+			name: user.name,
+			email: user.email,
+			token: generateToken(user._id),
+		})
+	} else {
+		res.status(401)
+		throw new Error('Unauthorized: Invalid Credentials.')
+	}
 })
 
 // @desc Get User Profile
@@ -82,6 +100,13 @@ const getUserProfile = asyncHandler(async (req, res) => {
 		throw new Error('the username is invalid.')
 	}
 })
+
+// @desc Generate JWT
+const generateToken = id => {
+	return jwt.sign({ id }, process.env.JWT_SECRET, {
+		expiresIn: '30d',
+	})
+}
 
 module.exports = {
 	registerUser,
