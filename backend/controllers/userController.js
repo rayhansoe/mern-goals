@@ -20,16 +20,22 @@ const registerUser = asyncHandler(async (req, res) => {
 	const userExistByEmail = await User.findOne({ email })
 	const userExistByUsername = await User.findOne({ username })
 
-	// by email
-	if (userExistByEmail) {
+	// by email & username
+	if (userExistByEmail && userExistByUsername) {
 		res.status(400)
-		throw new Error('Email already taken.')
+		throw new Error('Username & Email already taken.')
 	}
 
 	// by username
 	if (userExistByUsername) {
 		res.status(400)
 		throw new Error('Username already taken.')
+	}
+
+	// by email
+	if (userExistByEmail) {
+		res.status(400)
+		throw new Error('Email already taken.')
 	}
 
 	// Hash Password
@@ -46,10 +52,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
 	if (user) {
 		res.status(201).json({
-			_id: user.id,
-			username: user.username,
-			name: user.name,
-			email: user.email,
 			token: generateToken(user._id),
 		})
 	} else {
@@ -62,18 +64,14 @@ const registerUser = asyncHandler(async (req, res) => {
 // @route POST /api/users/login
 // @access PUBLIC
 const loginUser = asyncHandler(async (req, res) => {
-	const { email, username, password } = req.body
+	const { text, password } = req.body
 
 	// check user
-	const user = (await User.findOne({ email })) || (await User.findOne({ username }))
+	const user = (await User.findOne({ email: text })) || (await User.findOne({ username: text }))
 
 	if (user && (await bcrypt.compare(password, user.password))) {
 		res.status(200)
 		res.json({
-			_id: user.id,
-			username: user.username,
-			name: user.name,
-			email: user.email,
 			token: generateToken(user._id),
 		})
 	} else {
@@ -88,28 +86,25 @@ const loginUser = asyncHandler(async (req, res) => {
 const getUserProfile = asyncHandler(async (req, res) => {
 	const usernameParam = req.params.username
 	const userExist = await User.findOne({ username: usernameParam })
-	
+
 	// if user exist
 	if (userExist) {
 		const { _id, username, name, email } = userExist
 
-		if (req.user && (userExist.id === req.user.id)) {
-			
+		if (req.user && userExist.id === req.user.id) {
 			res.status(200).json({
 				id: _id,
 				username,
 				name,
-				email
+				email,
 			})
 		} else {
-			
 			res.status(200).json({
 				id: _id,
 				username,
-				name
+				name,
 			})
 		}
-
 	} else {
 		res.status(404)
 		throw new Error('the username is invalid.')
