@@ -76,7 +76,10 @@ const updateGoal = asyncHandler(async (req, res) => {
 		new: true,
 	})
 
-	res.status(200).json(updatedGoal)
+	res.status(200).json({
+		updatedGoal,
+		message: 'The Goal is Updated',
+	})
 })
 
 // @desc Delete Goal by ID
@@ -105,7 +108,10 @@ const deleteGoal = asyncHandler(async (req, res) => {
 
 	await goal.remove()
 
-	res.status(200).json({ message: `Delete Goal ${req.params.id}` })
+	res.status(200).json({
+		message: `Delete Goal ${req.params.id}`,
+		id: req.params.id,
+	})
 })
 
 // *
