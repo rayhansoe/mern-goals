@@ -1,67 +1,58 @@
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
-const User  = require('../models/userModel')
+const jwt = require('jsonwebtoken')
+const asyncHandler = require('express-async-handler')
+const User = require('../models/userModel')
 
-const protect = asyncHandler( async (req, res, next) => {
-    let token 
+const protect = asyncHandler(async (req, res, next) => {
+	let token
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
+	if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+		try {
+			// Get Token from header
+			token = req.headers.authorization.split(' ')[1]
 
-            // Get Token from header
-            token = req.headers.authorization.split(' ')[1]
+			// verify
+			const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-            // verify
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+			// Get User from the Token / User yang login, bukan user yang mau dilihat.
+			req.user = await User.findById(decoded.id).select('-password')
 
-            // Get User from the Token / User yang login, bukan user yang mau dilihat.
-            req.user = await User.findById(decoded.id).select('-password')
-            
-            next()
-            
-        } catch (error) {
-            console.log(error)
-            res.status(401)
-            throw new Error('Not Authorized')
-        }
-    }
+			next()
+		} catch (error) {
+			console.log(error)
+			res.status(401)
+			throw new Error('Not Authorized')
+		}
+	}
 
-    if (!token) {
-        res.status(401)
-        throw new Error('Not Authorized, no token.')
-    }
-
+	if (!token) {
+		res.status(401)
+		throw new Error('Not Authorized.')
+	}
 })
 
-const protectGetUser = asyncHandler( async (req, res, next) => {
-    let token 
+const protectGetUser = asyncHandler(async (req, res, next) => {
+	let token
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
+	if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+		try {
+			// Get Token from header
+			token = req.headers.authorization.split(' ')[1]
 
-            // Get Token from header
-            token = req.headers.authorization.split(' ')[1]
+			// verify
+			const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-            // verify
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+			// Get User from the Token / User yang login, bukan user yang mau dilihat.
+			req.user = await User.findById(decoded.id).select('-password')
 
-            // Get User from the Token / User yang login, bukan user yang mau dilihat.
-            req.user = await User.findById(decoded.id).select('-password')
-            
-            next()
-            
-        } catch (error) {
-            console.log(error)
-            res.status(401)
-            throw new Error('Not Authorized')
-        }
-    }
+			next()
+		} catch (error) {
+			next()
+		}
+	}
 
-    if (!token) {
-            next() 
-        
-    }
-
+	if (!token) {
+		next()
+	}
 })
 
 module.exports = { protect, protectGetUser }
