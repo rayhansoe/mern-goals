@@ -10,7 +10,7 @@ const getGoals = asyncHandler(async (req, res) => {
 	res.status(200).json(goal)
 })
 
-// @desc Get Goals
+// @desc Get Goals by ID
 // @route GET /api/goals/:id
 // @access PRIVATE
 const getGoalsById = asyncHandler(async (req, res) => {
@@ -31,7 +31,7 @@ const getGoalsById = asyncHandler(async (req, res) => {
 	res.status(200).json(goal)
 })
 
-// @desc Set Goal
+// @desc Set Goal || Create Goal
 // @route POST /api/goals
 // @access PRIVATE
 const setGoal = asyncHandler(async (req, res) => {
@@ -48,7 +48,7 @@ const setGoal = asyncHandler(async (req, res) => {
 	res.status(200).json(goal)
 })
 
-// @desc Update Goal
+// @desc Update Goal by ID
 // @route PUT /api/goals/:id
 // @access PRIVATE
 const updateGoal = asyncHandler(async (req, res) => {
@@ -79,7 +79,7 @@ const updateGoal = asyncHandler(async (req, res) => {
 	res.status(200).json(updatedGoal)
 })
 
-// @desc Delete Goal
+// @desc Delete Goal by ID
 // @route DELETE /api/goals/:id
 // @access PRIVATE
 const deleteGoal = asyncHandler(async (req, res) => {
