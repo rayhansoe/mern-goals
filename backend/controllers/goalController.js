@@ -6,7 +6,7 @@ const User = require('../models/userModel')
 // @route GET /api/goals
 // @access PRIVATE
 const getGoals = asyncHandler(async (req, res) => {
-	const goal = await Goal.find({user: req.user.id})
+	const goal = await Goal.find({ user: req.user.id })
 	res.status(200).json(goal)
 })
 
@@ -16,16 +16,14 @@ const getGoals = asyncHandler(async (req, res) => {
 const getGoalsById = asyncHandler(async (req, res) => {
 	const goal = await Goal.findById(req.params.id)
 
-	const user = await User.findById(req.user.id)
-
 	// Check User
-	if (!user) {
+	if (!req.user) {
 		res.status(401)
-		throw new Error('user not found!')
+		throw new Error('User not authorized!')
 	}
-	
+
 	// Make sure  the logged in user matches the goal user
-	if (goal.user.toString() !== user.id) {
+	if (goal.user.toString() !== req.user.id) {
 		res.status(401)
 		throw new Error('User not authorized!')
 	}
@@ -62,16 +60,14 @@ const updateGoal = asyncHandler(async (req, res) => {
 		throw new Error('Goal Not Found!')
 	}
 
-	const user = await User.findById(req.user.id)
-
 	// Check User
-	if (!user) {
+	if (!req.user) {
 		res.status(401)
-		throw new Error('user not found!')
+		throw new Error('User not authorized!')
 	}
-	
+
 	// Make sure  the logged in user matches the goal user
-	if (goal.user.toString() !== user.id) {
+	if (goal.user.toString() !== req.user.id) {
 		res.status(401)
 		throw new Error('User not authorized!')
 	}
@@ -95,16 +91,14 @@ const deleteGoal = asyncHandler(async (req, res) => {
 		throw new Error('Goal Not Found!')
 	}
 
-	const user = await User.findById(req.user.id)
-
 	// Check User
-	if (!user) {
+	if (!req.user) {
 		res.status(401)
-		throw new Error('user not found!')
+		throw new Error('User not authorized!')
 	}
-	
+
 	// Make sure  the logged in user matches the goal user
-	if (goal.user.toString() !== user.id) {
+	if (goal.user.toString() !== req.user.id) {
 		res.status(401)
 		throw new Error('User not authorized!')
 	}
@@ -123,5 +117,5 @@ module.exports = {
 	setGoal,
 	updateGoal,
 	deleteGoal,
-	getGoalsById
+	getGoalsById,
 }
