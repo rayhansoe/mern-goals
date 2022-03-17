@@ -45,7 +45,7 @@ const setGoal = asyncHandler(async (req, res) => {
 		user: req.user.id,
 	})
 
-	res.status(200).json(goal)
+	res.status(200).json({ goal, message: 'New Goal Created!' })
 })
 
 // @desc Update Goal by ID
