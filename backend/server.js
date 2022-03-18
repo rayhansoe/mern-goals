@@ -18,6 +18,12 @@ app.use(cors({ origin: true }))
 app.use('/api/goals', require('./routes/goalRoutes'))
 app.use('/api/users', require('./routes/userRoutes'))
 
+if (process.env.NODE_ENV === 'production') {
+	app.get('/', (req, res) => res.redirect(301, 'http://goalsapp-one.vercel.app'))
+} else {
+	app.get('/', (req, res) => res.send('Please set to production'))
+}
+
 app.use(errorHandler)
 
 app.listen(port, () => console.log(`Server started on port ${port}`))
