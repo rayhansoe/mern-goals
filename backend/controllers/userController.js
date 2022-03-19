@@ -1,4 +1,5 @@
 const User = require('../models/userModel')
+const Device = require('../models/deviceModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const asyncHandler = require('express-async-handler')
@@ -51,14 +52,28 @@ const registerUser = asyncHandler(async (req, res) => {
 	})
 
 	if (user) {
-		res.status(201).json({
-			token: generateToken(user._id),
-			userProfile: {
-				_id: user._id,
-				username,
-				name,
-			},
+		const userDevices = await Device.find({ user: user._id })
+
+		if (userDevices > 5) {
+			res.status(401)
+			throw new Error('Unauthorized: Invalid Credentials.')
+		}
+
+		const device = await Device.create({
+			device: req.headers['user-agent'],
+			user: _id,
 		})
+
+		if (device) {
+			res.status(201).json({
+				token: generateToken(user._id),
+				userProfile: {
+					_id: user._id,
+					username,
+					name,
+				},
+			})
+		}
 	} else {
 		res.status(400)
 		throw new Error('Invalid user data.')
@@ -76,15 +91,30 @@ const loginUser = asyncHandler(async (req, res) => {
 
 	if (user && (await bcrypt.compare(password, user.password))) {
 		const { _id, username, name } = user
-		res.status(200)
-		res.json({
-			token: generateToken(user._id),
-			userProfile: {
-				_id,
-				username,
-				name,
-			},
+		const userDevices = await Device.find({ user: _id })
+
+		if (userDevices && userDevices > 5) {
+			res.status(401)
+			throw new Error('Unauthorized: Invalid Credentials.')
+		}
+
+		const userAgent = req.headers['user-agent'].toString()
+		const device = await Device.create({
+			device: userAgent,
+			user: user._id,
 		})
+
+		if (device) {
+			res.status(200)
+			res.json({
+				token: generateToken(user._id),
+				userProfile: {
+					_id,
+					username,
+					name,
+				},
+			})
+		}
 	} else {
 		res.status(401)
 		throw new Error('Unauthorized: Invalid Credentials.')
@@ -98,11 +128,19 @@ const getUserProfile = asyncHandler(async (req, res) => {
 	const usernameParam = req.params.username
 	const userExist = await User.findOne({ username: usernameParam })
 
+	const userAgent = req.headers['user-agent'].toString()
+
+	const userDevice = await Device.findOne({ device: userAgent })
+
 	// if user exist
 	if (userExist) {
 		const { _id, username, name, email } = userExist
 
-		if (req.user && userExist.id === req.user.id) {
+		if (
+			req.user &&
+			userExist.id === req.user.id &&
+			JSON.stringify(userDevice.user) === JSON.stringify(req.user._id)
+		) {
 			res.status(200).json({
 				id: _id,
 				username,
@@ -122,6 +160,26 @@ const getUserProfile = asyncHandler(async (req, res) => {
 	}
 })
 
+// @desc logout user
+// @route POST /api/users/logout
+// @access PRIVATE
+const logout = asyncHandler(async (req, res) => {
+	const userAgent = req.headers['user-agent'].toString()
+
+	const device = await Device.findOne({ device: userAgent })
+
+	if (!device) {
+		res.status(400)
+		throw new Error('Device not match.')
+	}
+
+	await device.remove()
+
+	res.status(200).json({
+		message: `Success Logout.`,
+	})
+})
+
 // @desc Generate JWT
 const generateToken = id => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, {})
@@ -131,4 +189,5 @@ module.exports = {
 	registerUser,
 	loginUser,
 	getUserProfile,
+	logout,
 }

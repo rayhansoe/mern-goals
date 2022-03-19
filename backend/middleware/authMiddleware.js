@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const asyncHandler = require('express-async-handler')
 const User = require('../models/userModel')
+const Device = require('../models/deviceModel')
 
 const protect = asyncHandler(async (req, res, next) => {
 	let token
@@ -16,7 +17,13 @@ const protect = asyncHandler(async (req, res, next) => {
 			// Get User from the Token / User yang login, bukan user yang mau dilihat.
 			req.user = await User.findById(decoded.id).select('-password')
 
-			next()
+			const user = await User.findById(decoded.id)
+
+			const userAgent = req.headers['user-agent'].toString()
+
+			const userDevice = await Device.findOne({ device: userAgent })
+
+			JSON.stringify(userDevice.user) === JSON.stringify(user._id) && next()
 		} catch (error) {
 			console.log(error)
 			res.status(401)
