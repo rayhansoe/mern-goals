@@ -99,10 +99,12 @@ const loginUser = asyncHandler(async (req, res) => {
 		}
 
 		const userAgent = req.headers['user-agent'].toString()
-		const device = await Device.create({
-			device: userAgent,
-			user: user._id,
-		})
+		const device =
+			(await Device.findOne({ device: userAgent })) ||
+			(await Device.create({
+				device: userAgent,
+				user: user._id,
+			}))
 
 		if (device) {
 			res.status(200)
