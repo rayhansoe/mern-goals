@@ -25,7 +25,6 @@ const protect = asyncHandler(async (req, res, next) => {
 
 			JSON.stringify(userDevice.user) === JSON.stringify(user._id) && next()
 		} catch (error) {
-			console.log(error)
 			res.status(401)
 			throw new Error('Not Authorized')
 		}
