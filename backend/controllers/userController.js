@@ -59,10 +59,12 @@ const registerUser = asyncHandler(async (req, res) => {
 			throw new Error('Unauthorized: Invalid Credentials.')
 		}
 
-		const device = await Device.create({
-			device: req.headers['user-agent'],
-			user: _id,
-		})
+		const device =
+			(await Device.findOne({ device: userAgent, user: user._id })) ||
+			(await Device.create({
+				device: userAgent,
+				user: user._id,
+			}))
 
 		if (device) {
 			res.status(201).json({
@@ -100,7 +102,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 		const userAgent = req.headers['user-agent'].toString()
 		const device =
-			(await Device.findOne({ device: userAgent })) ||
+			(await Device.findOne({ device: userAgent, user: _id })) ||
 			(await Device.create({
 				device: userAgent,
 				user: user._id,

@@ -21,7 +21,8 @@ const protect = asyncHandler(async (req, res, next) => {
 
 			const userAgent = req.headers['user-agent'].toString()
 
-			const userDevice = await Device.findOne({ device: userAgent })
+			// const userDevice = await Device.findOne({ device: userAgent })
+			const userDevice = await Device.findOne({ device: userAgent, user: user._id })
 
 			JSON.stringify(userDevice.user) === JSON.stringify(user._id) && next()
 		} catch (error) {
