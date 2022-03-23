@@ -102,7 +102,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 		const userAgent = req.headers['user-agent'].toString()
 		const device =
-			(await Device.findOne({ device: userAgent, user: _id })) ||
+			(await Device.findOne({ device: userAgent, user: user._id })) ||
 			(await Device.create({
 				device: userAgent,
 				user: user._id,
