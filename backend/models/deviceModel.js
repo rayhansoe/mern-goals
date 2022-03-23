@@ -11,7 +11,6 @@ const deviceSchema = mongoose.Schema(
 		device: {
 			type: String,
 			required: [true, 'Please add a text value'],
-			unique: true,
 		},
 	},
 
