@@ -56,7 +56,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 		if (userDevices > 5) {
 			res.status(401)
-			throw new Error('Unauthorized: Invalid Credentials.')
+			throw new Error('Your Devices is limit. Logout or tell admin.')
 		}
 
 		const device =
@@ -75,6 +75,9 @@ const registerUser = asyncHandler(async (req, res) => {
 					name,
 				},
 			})
+		} else {
+			res.status(401)
+			throw new Error('Unauthorized: Invalid Credentials.')
 		}
 	} else {
 		res.status(400)
@@ -97,7 +100,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 		if (userDevices && userDevices > 5) {
 			res.status(401)
-			throw new Error('Unauthorized: Invalid Credentials.')
+			throw new Error('Your Devices is limit. Logout or tell admin.')
 		}
 
 		const userAgent = req.headers['user-agent'].toString()
@@ -118,6 +121,9 @@ const loginUser = asyncHandler(async (req, res) => {
 					name,
 				},
 			})
+		} else {
+			res.status(401)
+			throw new Error('Unauthorized: Invalid Credentials.')
 		}
 	} else {
 		res.status(401)
